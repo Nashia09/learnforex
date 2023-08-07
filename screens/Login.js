@@ -1,8 +1,24 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, ImageBackground, StyleSheet,TouchableOpacity,Image } from 'react-native';
 import { TextInput, Button,Text } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import {firebase} from '../config';
+
 const Login = ({navigation}) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  loginUser = async(email,password) =>{
+    try{
+      await firebase.auth().signInWithEmailAndPassword(email,password);
+
+    }
+    catch(error){
+      alert(error.message);
+    }
+  }
+  
+  
   return (
     <View style={styles.container}>
       <ImageBackground
@@ -16,6 +32,7 @@ const Login = ({navigation}) => {
             mode="outlined"
             activeOutlineColor='#3EB5E4'
             style={styles.input}
+            onChangeText={(email) => setEmail(email)}
             right={<TextInput.Icon icon="email" />}
           />
           <TextInput
@@ -23,12 +40,19 @@ const Login = ({navigation}) => {
             mode="outlined"
             secureTextEntry
             style={styles.input}
+            onChangeText={(password) => setPassword(password)}
             activeOutlineColor='#3EB5E4'
             right={<TextInput.Icon icon="eye" />}
           />
-          <Button mode="contained" style={styles.button}>
+          <TouchableOpacity onPress={() => navigation.navigate('homescreen')}>
+
+          <Button 
+          onPress={() => {loginUser(email, password), navigation.replace('homescreen')}}
+          mode="contained" 
+          style={styles.button}>
             Log In
           </Button>
+        </TouchableOpacity>
           <View style={styles.socialIcons}>
             <TouchableOpacity style={styles.socialIcon}>
               <Icon name="facebook" size={30} color="#3b5998" />

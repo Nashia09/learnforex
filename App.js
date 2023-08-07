@@ -12,6 +12,9 @@ import Settings from './screens/Settings';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
+import { firebase } from './config';
+import { useEffect, useState } from 'react';
+
 
 
 
@@ -76,27 +79,77 @@ function MyBottomTab() {
   </BottomTabs.Navigator>
 }
 export default function App() {
-  return (
-    <View style={styles.container}>
+
+  const [initializing, setInitializing] = useState(true);
+  const [user, setUser] = useState(null);
+
+
+  function onAuthStateChanged(user) {
+    setUser(user);
+    if (initializing) setInitializing(false);
+  }
+
+  useEffect(() => {
+    const subcriber = firebase.auth().onAuthStateChanged(onAuthStateChanged);
+    return subcriber;
+  }, []);
+
+  if (initializing) return null;
+
+  if (!user) {
+    return (
       <NavigationContainer>
+
         <Stack.Navigator>
-      <Stack.Screen
-        options={{
-          headerShown: false
-      
-        }} name='onboarding' component={Onboarding} />
 
           <Stack.Screen
             options={{
               headerShown: false
-              
+
             }} name='login' component={Login} />
 
           <Stack.Screen
+            name='register'
+            component={Register}
             options={{
               headerShown: false
-              
-            }} name='register' component={Register} />
+
+            }}
+          />
+          <Stack.Screen name='homescreen' options={{ headerShown: false }}
+            component={MyBottomTab} />
+        </Stack.Navigator>
+      </NavigationContainer>
+
+    )
+  }
+
+
+  return (
+    <View style={styles.container}>
+
+      <NavigationContainer>
+        <Stack.Navigator>
+          <Stack.Screen
+            options={{
+              headerShown: false
+
+            }} name='onboarding' component={Onboarding} />
+
+
+          <Stack.Screen
+            name='register'
+            component={Register}
+            options={{
+              headerShown: false
+
+            }}
+          />
+          <Stack.Screen
+            options={{
+              headerShown: false
+
+            }} name='login' component={Login} />
           <Stack.Screen name='homescreen' options={{ headerShown: false }}
             component={MyBottomTab} />
           <Stack.Screen name='details' component={Details} />

@@ -1,9 +1,27 @@
 import { Ionicons, AntDesign } from '@expo/vector-icons';
-import React from 'react';
-import { View, Text, TextInput, ScrollView } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, TextInput, ScrollView, useAnimatedValue } from 'react-native';
+import {firebase} from '../config';
+
 
 export default function HomeScreen() {
 
+    const [name,setName] = useState('');
+
+    useEffect(() =>{
+         firebase.firestore().collection('users')   
+         .doc(firebase.auth().currentUser?.uid).get()
+         .then((snapshot) =>{
+            if(snapshot.exists){
+                setName(snapshot.data())
+            }
+            else{
+                console.log('User does not exist')
+
+            }
+         })
+    },[])
+    // alert(name);
     const courses = ['Scalping', 'Price Action', 'Indicators','Price Action', 'Indicators'];
     return <View style={{ flex: 1, paddingTop: 40, paddingHorizontal: 12 }}>
         <View style={{
@@ -12,7 +30,7 @@ export default function HomeScreen() {
             padding: 20
         }}>
             <View style={{ flex: 1 }}>
-                <Text style={{ fontSize: 20, fontWeight: 'bold' }}>Welcome, Kofi</Text>
+                <Text style={{ fontSize: 20, fontWeight: 'bold' }}>Welcome, {name?.name}</Text>
                 <View style={{ flexDirection: 'row', marginLeft: 5, alignItems: 'center' }}>
                     <Ionicons style={{ color: 'gray' }} siz name='location' />
                     <Text style={{ color: 'gray', marginLeft: 10 }}>Abuja, Nigeria</Text>
@@ -32,7 +50,7 @@ export default function HomeScreen() {
 
                 <View style={{ flexDirection: 'row' }}>
 
-                    {courses.map((item,key) => (
+                    {courses.map((item) => (
                         <View style={{
                             borderWidth: 0.5,
                             padding: 10,
